@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import Joyride, { ACTIONS, EVENTS, STATUS } from 'react-joyride';
+import { ACTIONS, EVENTS, Joyride, STATUS } from 'react-joyride';
 import { useDispatch } from 'react-redux';
 import { setCurrentStep } from '../store/stepSlice.js';
 
@@ -12,7 +12,7 @@ function TourJoyride({ run, onStop }) {
       {
         target: '.app-steps',
         content: '這是導覽，將導覽第一步到第五步驟。',
-        disableBeacon: true,
+        skipBeacon: true,
         placement: 'bottom',
         data: { appStep: 1 },
       },
@@ -20,14 +20,14 @@ function TourJoyride({ run, onStop }) {
         {
           target: `.step-panel-${appStep}`,
           content: `這是第 ${appStep} 步，這裡可以放此步驟的主要說明文字。`,
-          disableBeacon: true,
+          skipBeacon: true,
           placement: 'top',
           data: { appStep },
         },
         {
           target: `.step-guide-target-${appStep}`,
           content: `這是 Step ${appStep} 的「導覽說明測試」元件，可用來說明此區塊的細節。`,
-          disableBeacon: true,
+          skipBeacon: true,
           placement: 'bottom',
           data: { appStep },
         },
@@ -69,13 +69,17 @@ function TourJoyride({ run, onStop }) {
 
   return (
     <Joyride
-      callback={handleTourCallback}
       continuous
-      hideCloseButton={false}
+      onEvent={handleTourCallback}
+      options={{
+        buttons: ['skip', 'back', 'close', 'primary'],
+        primaryColor: '#1677ff',
+        showProgress: true,
+        textColor: '#1f2937',
+        zIndex: 1200,
+      }}
       run={run}
       scrollToFirstStep
-      showProgress
-      showSkipButton
       stepIndex={tourStepIndex}
       steps={tourSteps}
       locale={{
@@ -83,15 +87,8 @@ function TourJoyride({ run, onStop }) {
         close: '關閉',
         last: '完成',
         next: '下一步',
-        nextLabelWithProgress: '下一步（第 {step} / {steps} 步）',
+        nextWithProgress: '下一步（第 {current} / {total} 步）',
         skip: '跳過',
-      }}
-      styles={{
-        options: {
-          primaryColor: '#1677ff',
-          textColor: '#1f2937',
-          zIndex: 1200,
-        },
       }}
     />
   );
